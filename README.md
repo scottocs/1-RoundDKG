@@ -6,16 +6,15 @@ contracts/: smart contract run on EVM to verify the ciphertexts
 test.py: test the gas consumption in the terminal
 
 ## Prerequisition:
-    Ganache (2.3.0)
-    solidity compiler (v0.5.17)
-    web3
+    1). Ganache (2.3.0)    
+    2). solidity compiler (v0.5.17)
+    3). web3
 
 ## Test example (10 participants (n=10) in the DKG protocol):
-    python3 test.py
-
-    result:
-
-    !(https://github.com/scottocs/ABEDKG/blob/main/dkgresult.png?raw=true)
+	1. open ganache
+    2. python3 test.py
+    3. result:
+    ![image](https://github.com/scottocs/ABEDKG/blob/main/dkgresult.png?raw=true)
 
 ## Note
 
