@@ -13,6 +13,7 @@ import util
 # import maabe as abe
 import hashlib
 import ma_abe
+import newjson
 from ma_abe2 import MaabeRW15
 
 FQ, FQ2, FQ12, field_modulus = lib.FQ, lib.FQ2, lib.FQ12, lib.field_modulus
@@ -37,21 +38,61 @@ def hash2(str):
     x = hashlib.sha256()
     x.update((str+"2").encode())
     return x.hexdigest()
+n=10
+authKeys = []
+maabe = None
+gp = None
+
+def tuple2G(tpl):
+    if len(tpl) == 2 and type(tpl[0]) == "<class 'int'>":
+        g1 = lib.FQ(tpl[0],tpl[1])
+        return g1
+    if len(tpl) == 2 and type(tpl[0]) == "<class 'list'>" or type(tpl[0]) == "<class 'tuple'>":
+        g2 = lib.FQ(tpl[0],tpl[1])
+        return g2
+
+def init(): 
+    global maabe
+    global authKeys
+    global gp
+    maabe = MaabeRW15()       
+    gp = maabe.setup()     
+    for i in range(0, n):
+        (pk, sk) = maabe.authsetup(gp, "AU"+str(i)) 
+        authKeys.append((pk,sk))
+    print("done authority setup")
+
+
+
+def multiple_enc_and_proof():
+    global maabe
+    global authKeys
+    global gp
+    ctAll = []
+    for i in range(0, n):
+        ct = enc_and_proof()
+        # for key in ct:
+        #     print(i, key, type(ct[key]))
+        ctAll.append(ct)
+    open('sample_ct_list'+str(n)+'.json','w').write(newjson.dumps(ctAll))
+
 
 
 def enc_and_proof():
-    maabe = MaabeRW15()
-    gp = maabe.setup() 
+    global maabe
+    global authKeys
+    global gp
     pks = {} 
-    n=10
+    
     print("n=",n)
     for i in range(0, n):
-        (pk, sk) = maabe.authsetup(gp, "AU"+str(i)) 
+        (pk, sk) = authKeys[i]
+        # (pk, sk) = maabe.authsetup(gp, "AU"+str(i)) 
         # user_attributes1 = ['STUDENT@UT', 'PHD@UT'] 
         # user_keys1 = maabe.multiple_attributes_keygen(gp, sk1, "bob", user_attributes1) 
         pks["AU"+str(i)]=pk
     # print(pk, sk)
-    print("done authority setup")
+    
 
     # print(user_keys1)    
 
@@ -179,7 +220,10 @@ def enc_and_proof():
 if __name__ == "__main__":
     # cipher_text = maabe.encrypt(gp, pks, message, access_policy) 
     # print(type(message))
-    enc_and_proof()
+    init()
+    # enc_and_proof()
+
+    multiple_enc_and_proof()
 
 
 

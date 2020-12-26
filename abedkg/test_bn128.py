@@ -1,16 +1,29 @@
 import time
 from py_ecc import bn128, optimized_bn128
-
+import random
 print('Starting bn128 tests')
 
-for lib in (bn128, optimized_bn128):
+def randomInt():
+    r = int(random.random()* lib.curve_order)
+    return r
+for lib in (optimized_bn128,bn128):
     FQ, FQ2, FQ12, field_modulus = lib.FQ, lib.FQ2, lib.FQ12, lib.field_modulus
     assert FQ(2) * FQ(2) == FQ(4)
     assert FQ(2) / FQ(7) + FQ(9) / FQ(7) == FQ(11) / FQ(7)
     assert FQ(2) * FQ(7) + FQ(9) * FQ(7) == FQ(11) * FQ(7)
     assert FQ(9) ** field_modulus == FQ(9)
-    print('FQ works fine')
-    
+    # print('FQ works fine')
+    # st=time.time()
+    # FQ(randomInt()) + FQ(randomInt())
+    # print('FQ add',time.time()-st)
+    # st=time.time()
+    # FQ(randomInt()) * FQ(randomInt())
+    # print('FQ multiply',time.time()-st)
+    # st=time.time()
+    # FQ(randomInt()) ** randomInt()
+    # print('FQ exp',time.time()-st)
+    # exit()    
+
     x = FQ2([1, 0])
     f = FQ2([1, 2])
     fpx = FQ2([2, 2])
@@ -20,8 +33,20 @@ for lib in (bn128, optimized_bn128):
     assert one / f + x / f == (one + x) / f
     assert one * f + x * f == (one + x) * f
     assert x ** (field_modulus ** 2 - 1) == one
-    print('FQ2 works fine')
-    
+    # print('FQ2 works fine')
+    # a=FQ2([randomInt(),randomInt()])
+    # b=FQ2([randomInt(),randomInt()])
+    # st=time.time()
+    # a+b
+    # print('FQ2 add',time.time()-st)
+    # st=time.time()
+    # a*b
+    # print('FQ2 multiply',time.time()-st)
+    # st=time.time()
+    # a**randomInt()
+    # print('FQ2 exp',time.time()-st)
+    # exit()
+
     x = FQ12([1] + [0] * 11)
     f = FQ12([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     fpx = FQ12([2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
@@ -54,10 +79,60 @@ for lib in (bn128, optimized_bn128):
     assert is_inf(multiply(G1, curve_order))
     print('G1 works fine')
     # print(G2)
-    print(multiply(G2, 9))
+    # print(multiply(G2, 9))
     # print(G2[0]*9,G2[1]*2)
     # exit()
+    print('FQ2 works fine')
+    N=100
+    a=multiply(G1, randomInt())
+    b=multiply(G1, randomInt())
+    st=time.time()
+    for i in range(0, N):        
+        add(a,b)
+    print('G1 add',(time.time()-st)/N)
+    st=time.time()
+    for i in range(0, N):        
+        multiply(a,randomInt())
+    print('G1 multiply',(time.time()-st)/N)
+        # st=time.time()
+        # multiply(a,randomInt())
+        # print('G1 multiply',time.time()-st)
+        # exit()
 
+    # a=multiply(G2, randomInt())
+    # b=multiply(G2, randomInt())
+    c=multiply(G2, randomInt())
+    d=multiply(G2, randomInt())
+    st=time.time()
+    for i in range(0, N):        
+        add(c,d)
+    print('G2 add',(time.time()-st)/N)
+    st=time.time()
+    for i in range(0, N):        
+        multiply(c,randomInt())
+    print('G2 multiply',(time.time()-st)/N)
+    
+
+    st=time.time()
+    for i in range(0, N):        
+        lib.pairing(c, a)
+    print('pairing',(time.time()-st)/N)
+
+    
+
+    a=multiply(G12, randomInt())
+    b=multiply(G12, randomInt())
+    st=time.time()
+    for i in range(0, N):        
+        add(a,b)
+    print('G12 add',(time.time()-st)/N)
+    st=time.time()
+    for i in range(0, N):        
+        multiply(a,randomInt())
+    print('G12 multiply',(time.time()-st)/N)
+
+
+    exit()
 
     assert eq(add(add(double(G2), G2), G2), double(double(G2)))
     assert not eq(double(G2), G2)
@@ -107,3 +182,4 @@ for lib in (bn128, optimized_bn128):
     assert p3 == po3
     print('Composite check passed')
     print('Total time for pairings: %.3f' % (time.time() - a))
+

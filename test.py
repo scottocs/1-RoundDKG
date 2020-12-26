@@ -56,12 +56,20 @@ ctt = w3.eth.contract(
    abi=contract_interface['abi'])
 # print(contract_interface['abi'])
 
+# gas_estimate = ctt.functions.simG2().estimateGas()
+# print("Sending transaction to simG2()",gas_estimate)
+# tx_hash = ctt.functions.simG2().transact({"from":w3.eth.accounts[0], 'gas': 500_000_000})
+
+
+# exit()
+
 from abedkg import newjson
 from abedkg import util
 import json
 
 from abedkg import sigma_protocol2
 # ct=newjson.dumps(sigma_protocol2.enc_and_proof())
+sigma_protocol2.init()
 ct=json.loads(newjson.dumps(sigma_protocol2.enc_and_proof()))
 
 # import abedkg.setting

@@ -86,7 +86,7 @@ class MaabeRW15():
         # print(H("123"),F("123"))
         # print(type(g1[0]))
         # print(type(gp[""]))
-        gp = {'g1': g1, 'g2': g2, 'egg': egg, 'H': H, 'F': F}
+        gp = {'g1': g1, 'g2': g2, 'egg': egg, 'H': H, 'F': F,'h':FQ(int(2**256*random.random())% field_modulus),'j':FQ(int(2**256*random.random())% field_modulus),'k':FQ(int(2**256*random.random())% field_modulus)}
         if debug:
             print("Global Setup=========================")
             print(gp["egg"])
@@ -314,9 +314,9 @@ class MaabeRW15():
                                 "Mtilde":Mtilde,
                                 "dkg_pk":dkg_pk,
                                 "dkg_pkp":dkg_pkp,
-                                "h":h,
-                                "k":k,
-                                "j":j,
+                                "h":gp["h"],
+                                "k":gp["k"],
+                                "j":gp["j"],
                                 # "eta":eta,
                                 # "etap":etap,
                                 "Mhat":Mhat,
