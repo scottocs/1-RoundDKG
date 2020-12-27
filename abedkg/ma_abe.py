@@ -246,20 +246,20 @@ class MaabeRW15():
         Mhat = (Mp - c*M)      
         zhat=zp-c*z  
         h=FQ(int(2**256*random.random())% field_modulus)
-        k=FQ(int(2**256*random.random())% field_modulus)
-        j=FQ(int(2**256*random.random())% field_modulus)
+        # k=FQ(int(2**256*random.random())% field_modulus)
+        # j=FQ(int(2**256*random.random())% field_modulus)
         for i in range(0, len(quotient)):            
             dkg_pk[i] = h ** (int(M.coeffs[i]))
             dkg_pkp[i] = h ** (int(Mp.coeffs[i]))                
-            Mp_M=int(Mp.coeffs[i]) - c*int(M.coeffs[i])            
+            Mp_M=int(Mp.coeffs[i]) - c*int(M.coeffs[i])             
             quotient[i]=int((Mp_M - int(Mhat.coeffs[i]))//field_modulus)            
             # assert(dkg_pkp[i]* h**(-quotient[i]) == h**(int(Mhat.coeffs[i])) * dkg_pk[i]**c )
-            eta[i]=j ** (int(M.coeffs[i])) * k ** z
-            etap[i]=j ** (int(Mp.coeffs[i])) * k ** zp
-            if zhat<0:
-                assert(etap[i]* j**(-quotient[i]) * k**(-zhat) == j**(int(Mhat.coeffs[i]))  * eta[i]**c )
-            else:
-                assert(etap[i]* j**(-quotient[i]) == j**(int(Mhat.coeffs[i])) * k**zhat * eta[i]**c )
+            # eta[i]=j ** (int(M.coeffs[i])) * k ** z
+            # etap[i]=j ** (int(Mp.coeffs[i])) * k ** zp
+            # if zhat<0:
+            #     assert(etap[i]* j**(-quotient[i]) * k**(-zhat) == j**(int(Mhat.coeffs[i]))  * eta[i]**c )
+            # else:
+            #     assert(etap[i]* j**(-quotient[i]) == j**(int(Mhat.coeffs[i])) * k**zhat * eta[i]**c )
         
         # print({'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4})
         return {'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4,\
@@ -276,8 +276,8 @@ class MaabeRW15():
                                 "dkg_pk":dkg_pk,
                                 "dkg_pkp":dkg_pkp,
                                 "h":h,
-                                "k":k,
-                                "j":j,
+                                # "k":k,
+                                # "j":j,
                                 "eta":eta,
                                 "etap":etap,
                                 "Mhat":Mhat,

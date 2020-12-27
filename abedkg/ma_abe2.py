@@ -288,15 +288,15 @@ class MaabeRW15():
         Mpairing = pairing(M[0],M[1])
         Mhat = (Mppairing - c*Mpairing)      
         zhat=(zp-c*z)  %(field_modulus-1)
-        h=FQ(int(2**256*random.random())% field_modulus)
-        k=FQ(int(2**256*random.random())% field_modulus)
-        j=FQ(int(2**256*random.random())% field_modulus)
+        h=gp["h"]
+        k=gp["k"]
+        j=gp["j"]
         for i in range(0, len(quotient)):            
             dkg_pk[i] = h ** (int(Mpairing.coeffs[i]))
             dkg_pkp[i] = h ** (int(Mppairing.coeffs[i]))                
             Mppairing_M=int(Mppairing.coeffs[i]) - c*int(Mpairing.coeffs[i])
             quotient[i]=int((Mppairing_M - int(Mhat.coeffs[i]))//field_modulus)% (field_modulus-1)
-            # assert(dkg_pkp[i] == h**(int(Mhat.coeffs[i]))* h**(quotient[i])* dkg_pk[i]**c )
+            assert(dkg_pkp[i] == h**(int(Mhat.coeffs[i]))* h**(quotient[i])* dkg_pk[i]**c )
             # eta[i]=j ** (int(Mpairing.coeffs[i])) * k ** z
             # etap[i]=j ** (int(Mppairing.coeffs[i])) * k ** zp
             # assert(etap[i] == j**(int(Mhat.coeffs[i])) * j**quotient[i] * k**zhat * eta[i]**c )
