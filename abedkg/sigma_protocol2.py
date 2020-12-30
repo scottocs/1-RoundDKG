@@ -64,65 +64,6 @@ def init():
     print("done authority setup")
 
 
-def aggregateCT(ctArr):
-    # 0 policy <class 'str'>
-    # 0 C0 <class 'tuple'>
-    # 0 C1 <class 'dict'>
-    # 0 C2 <class 'dict'>
-    # 0 CHat2 <class 'dict'>
-    # 0 C3 <class 'dict'>
-    # 0 CHat3 <class 'dict'>
-    # 0 C4 <class 'dict'>
-    # 0 C0p <class 'tuple'>
-    # 0 C1p <class 'dict'>
-    # 0 C2p <class 'dict'>
-    # 0 CHat2p <class 'dict'>
-    # 0 C3p <class 'dict'>
-    # 0 CHat3p <class 'dict'>
-    # 0 C4p <class 'dict'>
-    # 0 txhat <class 'dict'>
-    # 0 secret_shareshat <class 'dict'>
-    # 0 zero_shareshat <class 'dict'>
-    # 0 c <class 'int'>
-    # 0 cp <class 'int'>
-    # 0 ztilde <class 'int'>
-    # 0 Mtilde <class 'tuple'>
-    # 0 dkg_pk <class 'list'>
-    # 0 dkg_pkp <class 'list'>
-    # 0 h <class 'py_ecc.fields.bn128_FQ'>
-    # 0 k <class 'py_ecc.fields.bn128_FQ'>
-    # 0 j <class 'py_ecc.fields.bn128_FQ'>
-    # 0 Mhat <class 'py_ecc.fields.bn128_FQ12'>
-    # 0 zhat <class 'int'>
-    # 0 quotient <class 'list'>
-    # 0 egga <class 'dict'>
-    # 0 gy <class 'dict'>
-    # 0 g2y <class 'dict'>
-    # 0 attr_unpacked <class 'list'>
-    # 0 egg <class 'tuple'>
-    # 0 g1 <class 'tuple'>
-    # 0 g2 <class 'tuple'>
-    newCT = ctArr[0]
-    for i in range(1, len(ctArr)):
-        if key in ['policy','g1','g2','egg','h','k','j']:
-            continue
-        elif key in ['C0','C0p']:            
-            newCT[key][1] = lib.add(tuple2G(newCT[key][1]),tuple2G(ctArr[i][1]))
-        elif key in ["C1", "C2", "CHat2", "C3", "CHat3", "C4", "C1p", "C2p", "CHat2p", "C3p", "CHat3p", "C4p", "txhat", "secret_shareshat", "zero_shareshat"]:
-            for attr in ctArr[i][key]:
-                if key in ['C1','C1p']:
-                    newCT[key][attr][1] = lib.add(tuple2G(newCT[key][attr][1]),tuple2G(ctArr[i][1]))
-                elif key in ['C2', 'C2p','C3','C3p']:#G2
-                    newCT[key][attr] = lib.add(tuple2G(newCT[key][attr]),tuple2G(ctArr[i]))
-                elif key in ['C4', 'C4p','CHat3','CHat2']:#G1
-                    newCT[key][attr] = lib.add(tuple2G(newCT[key][attr]),tuple2G(ctArr[i]))
-
-
-
-        elif key in ['ztilde','cp','ztilde','zhat']:
-            if key not in newCT:
-                newCT[key] = 0
-            newCT[key]+=ctArr[i][key]
 
 
 def multiple_enc_and_proof():
@@ -198,11 +139,10 @@ def enc_and_proof():
 
     dkg_pkp=ct["dkg_pkp"]
     dkg_pk=ct["dkg_pk"]
-    st = time.time()
-    for i in range(0, len(quotient)):
-        # assert(dkg_pkp[i] == h**(int(Mhat.coeffs[i]))* h**quotient[i] * dkg_pk[i]**c )
-        assert(dkg_pkp[i] == h**(int(Mhat.coeffs[i]))* h**(quotient[i])* dkg_pk[i]**c )
-    print("dkg_pk check, passed",time.time()-st)
+    # st = time.time()
+    # for i in range(0, len(quotient)):
+    #     assert(dkg_pkp[i] == h**(int(Mhat.coeffs[i]))* h**(quotient[i])* dkg_pk[i]**c )
+    # print("dkg_pk check, passed",time.time()-st)
             
     ztilde=ct["ztilde"]
     Mtilde=ct["Mtilde"]
@@ -210,9 +150,9 @@ def enc_and_proof():
     C0=ct["C0"]
     # print(C0)
     cp=ct["cp"]
-    st = time.time()
-    assert(eq(C0p[1], add(add(Mtilde, multiply(gp['egg'][1],ztilde)), multiply(C0[1],cp))))    
-    print("C0 check, passed",time.time()-st)
+    # st = time.time()
+    # assert(eq(C0p[1], add(add(Mtilde, multiply(gp['egg'][1],ztilde)), multiply(C0[1],cp))))    
+    # print("C0 check, passed",time.time()-st)
     
 
     C1=ct["C1"]
@@ -247,44 +187,44 @@ def enc_and_proof():
         st = time.time()
         
 
-        assert(eq(C1p[i][1], add(\
-                                add(multiply(gp['egg'][1],(secret_shareshat[i]%curve_order)), \
-                                    multiply(pks[auth]['egga'][1],(txhat[i]))),\
-                                multiply(C1[i][1], (cp%curve_order)))))        
+        # assert(eq(C1p[i][1], add(\
+        #                         add(multiply(gp['egg'][1],(secret_shareshat[i]%curve_order)), \
+        #                             multiply(pks[auth]['egga'][1],(txhat[i]))),\
+        #                         multiply(C1[i][1], (cp%curve_order)))))        
         # print("C1 "+attr+" check, passed")
-        if "C1" in stDict:
-            stDict["C1"]+= (time.time() - st) 
-        else:
-            stDict["C1"] = (time.time() - st) 
-        st = time.time()
-        assert(eq(C2p[i],add(multiply(gp['g1'], curve_order-txhat[i]), multiply(C2[i], cp))))
-        assert(eq(pairing(gp['g1'], CHat2p[i]), pairing(C2p[i], gp["g2"])))       
+        # if "C1" in stDict:
+        #     stDict["C1"]+= (time.time() - st) 
+        # else:
+        #     stDict["C1"] = (time.time() - st) 
+        # st = time.time()
+        # assert(eq(C2p[i],add(multiply(gp['g1'], curve_order-txhat[i]), multiply(C2[i], cp))))
+        # assert(eq(pairing(gp['g1'], CHat2p[i]), pairing(C2p[i], gp["g2"])))       
         # # print(multiply(gp['g1'], curve_order-txhat[i]))
         # print("C2 "+attr+" check, passed")
-        if "C2" in stDict:
-            stDict["C2"]+= (time.time() - st) 
-        else:
-            stDict["C2"] = (time.time() - st) 
-        st = time.time()
-        assert(eq(C3p[i],\
-            add(add(multiply(pks[auth]['gy'], txhat[i]), multiply(gp['g1'], zero_shareshat[i])),\
-                multiply(C3[i],cp))))        
-        assert(eq(pairing(gp['g1'], CHat3p[i]), pairing(C3p[i], gp["g2"])))       
+        # if "C2" in stDict:
+        #     stDict["C2"]+= (time.time() - st) 
+        # else:
+        #     stDict["C2"] = (time.time() - st) 
+        # st = time.time()
+        # assert(eq(C3p[i],\
+        #     add(add(multiply(pks[auth]['gy'], txhat[i]), multiply(gp['g1'], zero_shareshat[i])),\
+        #         multiply(C3[i],cp))))        
+        # assert(eq(pairing(gp['g1'], CHat3p[i]), pairing(C3p[i], gp["g2"])))       
         # print("C3 "+attr+" check, passed")
-        if "C3" in stDict:
-            stDict["C3"]+= (time.time() - st) 
-        else:
-            stDict["C3"] = (time.time() - st) 
-        st = time.time()
-        assert(eq(C4p[i],add(multiply(gp['F'](attr), txhat[i]), multiply(C4[i], cp))))
+        # if "C3" in stDict:
+        #     stDict["C3"]+= (time.time() - st) 
+        # else:
+        #     stDict["C3"] = (time.time() - st) 
+        # st = time.time()
+        # assert(eq(C4p[i],add(multiply(gp['F'](attr), txhat[i]), multiply(C4[i], cp))))
         # print("C4 "+attr+" check, passed")
-        if "C4" in stDict:
-            stDict["C4"]+= (time.time() - st) 
-        else:
-            stDict["C4"] = (time.time() - st)         
+        # if "C4" in stDict:
+        #     stDict["C4"]+= (time.time() - st) 
+        # else:
+        #     stDict["C4"] = (time.time() - st)         
         # print(add(multiply(gp['F'](attr), txhat[i]), multiply(C4[i], cp)))
-    for c in stDict:
-        print(c,"check passed",stDict[c])
+    # for c in stDict:
+    #     print(c,"check passed",stDict[c])
 
         
     print("encrypt done")
