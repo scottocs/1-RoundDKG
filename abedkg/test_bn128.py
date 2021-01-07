@@ -115,6 +115,7 @@ for lib in (optimized_bn128,bn128):
 
     st=time.time()
     for i in range(0, N):        
+        # print(c,a)
         lib.pairing(c, a)
     print('pairing',(time.time()-st)/N)
 

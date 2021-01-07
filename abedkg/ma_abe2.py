@@ -236,7 +236,9 @@ class MaabeRW15():
             CHat3p[i] = add(multiply(pks[auth]['g2y'], txp[i]), multiply(gp['g2'], int(zero_sharesp[i])))
             C4p[i] = multiply(gp['F'](attr), txp[i])
             # print("",pairing(gp['g1'], CHat2p[i]), pairing(C2p[i], gp["g2"]))
-            # assert(eq(pairing(gp['g1'], CHat2p[i]), pairing(C2p[i], gp["g2"])))
+            
+            # assert(pairing(gp['g1'], CHat2p[i]) == pairing(C2p[i], gp["g2"]))
+
 
 
 
@@ -255,6 +257,7 @@ class MaabeRW15():
             #     add(add(multiply(pks[auth]['gy'], txhat[i]), \
             #             multiply(gp['g1'], zero_shareshat[i])),\
             #         multiply(C3[i],cp))))
+            # assert(pairing(gp['g1'], CHat3p[i]) == pairing(C3p[i], gp["g2"]))
             # print("C3 "+attr+" check, passed")
             # assert(eq(C4p[i],add(multiply(gp['F'](attr), txhat[i]), multiply(C4[i], cp))))
             # print("C4 "+attr+" check, passed")
@@ -296,7 +299,7 @@ class MaabeRW15():
             dkg_pkp[i] = h ** (int(Mppairing.coeffs[i]))                
             Mppairing_M=int(Mppairing.coeffs[i]) - c*int(Mpairing.coeffs[i])
             quotient[i]=int((Mppairing_M - int(Mhat.coeffs[i]))//field_modulus)% (field_modulus-1)
-            assert(dkg_pkp[i] == h**(int(Mhat.coeffs[i]))* h**(quotient[i])* dkg_pk[i]**c )
+            # assert(dkg_pkp[i] == h**(int(Mhat.coeffs[i]))* h**(quotient[i])* dkg_pk[i]**c )
             # eta[i]=j ** (int(Mpairing.coeffs[i])) * k ** z
             # etap[i]=j ** (int(Mppairing.coeffs[i])) * k ** zp
             # assert(etap[i] == j**(int(Mhat.coeffs[i])) * j**quotient[i] * k**zhat * eta[i]**c )
@@ -324,6 +327,37 @@ class MaabeRW15():
                                 "quotient":quotient,#element in FQ12 are in [0, field_modulus-1], the divi
                 }
 
+    def aggregateCT(self, gp, ct1, ct2):
+
+        ct={}
+        policy_str=ct1['policy']
+        if ct1['policy'] != ct2['policy']:
+            print("policy not equal!! cannot divide")
+            return
+        C0 = [gp['g1'], add(ct1['C0'][1], ct2['C0'][1])]
+        C0p = [gp['g1'], add(ct1['C0p'][1], ct2['C0p'][1])]
+        policy = self.abeutils.createPolicy(policy_str)
+        attribute_list = self.abeutils.getAttributeList(policy)
+
+
+        C1, C2, C3, C4, C1p, C2p, C3p, C4p = {}, {}, {}, {}, {}, {}, {}, {}
+        for i in attribute_list:
+            attribute_name, auth, _ = self.unpack_attribute(i)
+            attr = "%s@%s" % (attribute_name, auth)
+            C1[i] = [gp['g1'],{}]
+            C1[i][1] = add(ct1['C1'][i][1],ct2['C1'][i][1])
+            C2[i] = add(ct1['C2'][i],ct2['C2'][i])
+            C3[i] = add(ct1['C3'][i],ct2['C3'][i])            
+            C4[i] = add(ct1['C4'][i],ct2['C4'][i])            
+
+            C1p[i] = [gp['g1'],{}]
+            C1p[i][1] = add(ct1['C1p'][i][1],ct2['C1p'][i][1])        
+            C2p[i] = add(ct1['C2p'][i],ct2['C2p'][i])
+            C3p[i] = add(ct1['C3p'][i],ct2['C3p'][i])        
+            C4p[i] = add(ct1['C4p'][i],ct2['C4p'][i])
+        # print(C4p,ct1['C4p'])
+        return {'policy': policy_str, 'C0': C0, 'C1': C1, 'C2': C2, 'C3': C3, 'C4': C4,'C0p': C0p, 'C1p': C1p, 'C2p': C2p, 'C3p': C3p, 'C4p': C4p}
+
 
     def decrypt(self, gp, sk, ct):
         # print(ct)
@@ -336,7 +370,7 @@ class MaabeRW15():
         if not pruned_list:
             raise Exception("You don't have the required attributes for decryption!")
 
-        B = FQ12([1] + [0] * 11)
+        B  = FQ12([1] + [0] * 11)
         Bp = FQ12([1] + [0] * 11)
         
         for i in range(len(pruned_list)):
@@ -345,7 +379,7 @@ class MaabeRW15():
             exp=int(coefficients[y])
             if exp < 0:
                 exp+=curve_order
-
+            # print("C4,",ct['C4'], y in ct['C4'])
             a=pairing(ct['C2'][y], sk['keys'][x]['K'])
             b=pairing(ct['C3'][y], gp['H'](sk['GID']))
             c=pairing(sk['keys'][x]['KP'], ct['C4'][y])
@@ -374,12 +408,12 @@ if __name__ == '__main__':
     gp = maabe.setup() 
     (pk1, sk1) = maabe.authsetup(gp, "UT") 
     # print(pk, sk)
-    user_attributes1 = ['STUDENT@UT', 'PHD@UT'] 
+    user_attributes1 = ['STUDENT@UT', 'PHD1@UT', 'PHD2@UT', 'PHD3@UT', 'PHD4@UT', 'PHD5@UT', 'PHD6@UT', 'PHD7@UT', 'PHD8@UT', 'PHD9@UT'] 
     user_keys1 = maabe.multiple_attributes_keygen(gp, sk1, "bob", user_attributes1) 
     # print(user_keys1)
 
     (pk2, sk2) = maabe.authsetup(gp, "OU") 
-    user_attributes2 = ['STUDENT@OU'] 
+    user_attributes2 = ['STUDENT@OU', 'PHD1@OU', 'PHD2@OU', 'PHD3@OU', 'PHD4@OU', 'PHD5@OU', 'PHD6@OU', 'PHD7@OU', 'PHD8@OU', 'PHD9@OU'] 
     user_keys2 = maabe.multiple_attributes_keygen(gp, sk2, "bob", user_attributes2) 
     # print(user_keys2)
 
@@ -400,9 +434,10 @@ if __name__ == '__main__':
     message = (gp['g1'], multiply(gp['g2'], maabe.random()))#gp["egg"]**maabe.random()
     print("message",pairing(message[0],message[1]))
     cipher_text = maabe.encrypt(gp, public_keys, message, access_policy) 
-
+    print("ciphertext",cipher_text)
     user_keys = {'GID': "bob", 'keys': merge_dicts(user_keys1, user_keys2)}
     decrypted_message = maabe.decrypt(gp, user_keys, cipher_text) 
+    print(user_keys)
     print("decrypted_message",decrypted_message)
     
     print(decrypted_message == pairing(message[0],message[1]))

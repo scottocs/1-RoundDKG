@@ -126,7 +126,7 @@ def enc_and_proof(maabe,gp,pks,message,acp):
         print(c,"check passed",stDict[c])
 
 
-n=50
+n=10
 authKeys = []
 maabe = None
 gp = None

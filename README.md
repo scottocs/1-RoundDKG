@@ -17,6 +17,9 @@ test.py: test the gas consumption in the terminal
     ![image](https://github.com/scottocs/ABEDKG/blob/main/dkgresult.png?raw=true)
 
 ## Note
+When CP-ABE algorithms or batch decryption are tested on PC, change lib_bn128 to optimized_bn128 in the setting.py. 
+
+When ciphertexts and proofs are committed to Ganache, change lib_bn128 to bn128 in the setting.py. 
 
 These codes support the paper "1-Round Distributed Key Generation Using Decentralized CP-ABE" submitted to TDSC.
 
