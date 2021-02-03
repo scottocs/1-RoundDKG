@@ -21,6 +21,6 @@ When CP-ABE algorithms or batch decryption are tested on PC, change lib_bn128 to
 
 When ciphertexts and proofs are committed to Ganache, change lib_bn128 to bn128 in the setting.py. 
 
-These codes support the paper "1-Round Distributed Key Generation Using Decentralized CP-ABE" submitted to TDSC.
+These codes support the paper "1-round distributed key generation with efficient reconstruction using decentralized CP-ABE".
 
 All codes provided in this github are a proof of concept implementation and are not audited for implmentation bugs. Use with caution.
